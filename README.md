@@ -1,0 +1,20 @@
+# Intallation
+
+1. Add the required Cordova plugin
+
+```
+cordova plugin add cleverpush-cordova-plugin
+```
+
+
+2. Add the initialization code to your `index.js` file
+
+```javascript
+document.addEventListener('deviceready', function () {
+  var notificationOpenedCallback = function(data) {
+    console.log('notificationOpenedCallback: ' + JSON.stringify(data));
+  };
+
+  window.plugins.CleverPush.init("INSERT_YOUR_CHANNEL_ID", notificationOpenedCallback);
+}, false);
+```
