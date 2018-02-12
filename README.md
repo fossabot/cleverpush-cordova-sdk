@@ -3,7 +3,7 @@
 1. Add the required Cordova plugin
 
    ```
-   cordova plugin add cleverpush-cordova-plugin
+   cordova plugin add https://github.com/cleverpush/cleverpush-cordova-sdk.git
    ```
 
 
