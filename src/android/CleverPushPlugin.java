@@ -60,7 +60,7 @@ public class CleverPushPlugin extends CordovaPlugin {
         String channelId = data.getString(0);
         notificationOpenedCallbackContext = callbackContext;
 
-        OneSignal.init(this.cordova.getActivity(), appId, new CordovaNotificationOpenedHandler(notificationOpenedCallbackContext));
+        CleverPush.init(this.cordova.getActivity(), channelId, new CordovaNotificationOpenedHandler(notificationOpenedCallbackContext));
         return true;
       } catch (JSONException e) {
         Log.e(TAG, "execute: Got JSON Exception " + e.getMessage());
