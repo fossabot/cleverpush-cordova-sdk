@@ -1,0 +1,41 @@
+{
+  "name": "cleverpush-cordova-sdk",
+  "version": "0.0.1",
+  "description": "CleverPush Cordova plugin",
+  "cordova": {
+    "id": "com.cleverpush.cordova.sdk",
+    "platforms": [
+      "ios",
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cleverpush/cleverpush-cordova-sdk.git"
+  },
+  "keywords": [
+    "push",
+    "notification",
+    "cleverpush"
+  ],
+  "engines": [
+    {
+      "name": "cordova-android",
+      "version": ">=4.0.0"
+    },
+    {
+      "name": "apple-xcode",
+      "version": ">=6.2.0"
+    },
+    {
+      "name": "apple-ios",
+      "version": ">=7.0.0"
+    }
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cleverpush/cleverpush-cordova-sdk/issues"
+  },
+  "homepage": "https://github.com/cleverpush/cleverpush-cordova-sdk#readme"
+}
