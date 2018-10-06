@@ -1,4 +1,4 @@
-package com.plugin.gcm;
+package com.cleverpush.cordova;
 
 import android.app.Activity;
 import android.content.Context;
