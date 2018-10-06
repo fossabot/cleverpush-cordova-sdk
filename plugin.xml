@@ -28,6 +28,7 @@
         <framework src="com.cleverpush:cleverpush:+" />
         <framework src="com.android.support:support-v4:+" />
         <framework src="com.google.firebase:firebase-messaging:+" />
+        <framework src="com.google.code.gson:gson:2.8.5" />
 
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="CleverPush" >
