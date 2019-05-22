@@ -25,6 +25,9 @@ import com.cleverpush.listener.SubscribedListener;
 public class CleverPushPlugin extends CordovaPlugin {
   public static final String TAG = "CleverPushPlugin";
 
+  private static CallbackContext openedCallbackContext;
+  private static CallbackContext subscribedCallbackContext;
+
   private static void callbackSuccess(CallbackContext callbackContext, JSONObject jsonObject) {
     if (jsonObject == null) {
       jsonObject = new JSONObject();
@@ -58,20 +61,26 @@ public class CleverPushPlugin extends CordovaPlugin {
   }
 
   @Override
-  public boolean execute(String action, JSONArray data, CallbackContext openedContext, CallbackContext subscribedContext) {
+  public boolean execute(String action, JSONArray data, CallbackContext callbackContext) {
     if (action.equals("init")) {
       try {
         String channelId = data.getString(0);
 
-        CleverPush.getInstance(this.cordova.getActivity()).init(channelId, new CordovaNotificationOpenedHandler(openedContext), new CordovaSubscribedHandler(subscribedContext));
+        CleverPush.getInstance(this.cordova.getActivity()).init(channelId, new CordovaNotificationOpenedHandler(openedCallbackContext), new CordovaSubscribedHandler(subscribedCallbackContext));
         return true;
       } catch (JSONException e) {
         Log.e(TAG, "execute: Got JSON Exception " + e.getMessage());
         return false;
       }
+    } else if (action.equals("setNotificationOpenedHandler")) {
+        openedCallbackContext = callbackContext;
+        return true;
+    } else if (action.equals("setSubscribedHandler")) {
+        subscribedCallbackContext = callbackContext;
+        return true;
     } else {
       Log.e(TAG, "Invalid action: " + action);
-      // callbackError(callbackContext, "Invalid action : " + action);
+      callbackError(callbackContext, "Invalid action : " + action);
       return false;
     }
   }
