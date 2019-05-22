@@ -23,8 +23,18 @@ void failureCallback(NSString* callbackId, NSDictionary* data) {
     [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
 }
 
+void stringifyNotificationOpenedResult(CPNotificationOpenedResult* result) {
+    NSMutableDictionary* obj = [NSMutableDictionary new];
+    [obj setObject:result.notification forKeyedSubscript:@"notification"];
+    [obj setObject:result.subscription forKeyedSubscript:@"subscription"];
+
+    NSError * err;
+    NSData * jsonData = [NSJSONSerialization  dataWithJSONObject:obj options:0 error:&err];
+    return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+}
+
 void processNotificationOpened(CPNotificationOpenedResult* result) {
-    NSString * data = [result stringify];
+    NSString * data = stringifyNotificationOpenedResult(result);
     NSError *jsonError;
     NSData *objectData = [data dataUsingEncoding:NSUTF8StringEncoding];
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:objectData

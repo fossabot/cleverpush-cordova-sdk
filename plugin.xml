@@ -54,9 +54,9 @@
         <source-file src="src/android/CleverPushPlugin.java" target-dir="src/" />
     </platform>
 
-    <dependency id="cordova-plugin-cocoapod-support"/>
-
     <platform name="ios">
+
+        <framework src="CleverPush" type="podspec" />
 
         <pod name="CleverPush" />
 
