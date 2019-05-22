@@ -68,8 +68,8 @@ public class CleverPushPlugin extends CordovaPlugin {
 
         CleverPush.getInstance(this.cordova.getActivity()).init(channelId, new CordovaNotificationOpenedHandler(openedCallbackContext), new CordovaSubscribedHandler(subscribedCallbackContext));
         return true;
-      } catch (JSONException e) {
-        Log.e(TAG, "execute: Got JSON Exception " + e.getMessage());
+      } catch (Exception e) {
+        Log.e(TAG, "execute: Got Exception " + e.getMessage());
         return false;
       }
     } else if (action.equals("setNotificationOpenedHandler")) {
