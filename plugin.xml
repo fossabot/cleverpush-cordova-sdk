@@ -60,10 +60,10 @@
 
         <pod name="CleverPush" />
 
-        <header-file src="src/ios/AppDelegate+CleverPush.h" />
+        <!--<header-file src="src/ios/AppDelegate+CleverPush.h" />-->
         <header-file src="src/ios/CleverPushPlugin.h" />
 
-        <source-file src="src/ios/AppDelegate+CleverPush.m" />
+        <!--<source-file src="src/ios/AppDelegate+CleverPush.m" />-->
         <source-file src="src/ios/CleverPushPlugin.m" />
 
         <config-file target="config.xml" parent="/*">
