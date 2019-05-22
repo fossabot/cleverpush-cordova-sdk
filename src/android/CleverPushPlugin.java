@@ -11,6 +11,7 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import com.google.gson.Gson;
 
 import java.util.Iterator;
 import java.util.ArrayList;
@@ -30,6 +31,12 @@ public class CleverPushPlugin extends CordovaPlugin {
     }
 
     PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonObject);
+    pluginResult.setKeepCallback(true);
+    callbackContext.sendPluginResult(pluginResult);
+  }
+
+  private static void callbackSuccess(CallbackContext callbackContext, String resultString) {
+    PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, resultString);
     pluginResult.setKeepCallback(true);
     callbackContext.sendPluginResult(pluginResult);
   }
@@ -79,7 +86,13 @@ public class CleverPushPlugin extends CordovaPlugin {
     @Override
     public void notificationOpened(NotificationOpenedResult result) {
       try {
-        callbackSuccess(callbackContext, new JSONObject(result.getNotification()));
+        Gson gson = new Gson();
+
+        JSONObject resultObj = new JSONObject();
+        resultObj.put("notification", new JSONObject(gson.toJson(result.getNotification())));
+        resultObj.put("subscription", new JSONObject(gson.toJson(result.getSubscription())));
+
+        callbackSuccess(callbackContext, resultObj);
       } catch (Throwable t) {
         t.printStackTrace();
       }
