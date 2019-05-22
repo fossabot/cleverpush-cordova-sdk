@@ -5,6 +5,7 @@
 #import <CleverPush/CleverPush.h>
 
 NSString* notficationOpenedCallbackId;
+NSString* subscribedCallbackId;
 
 CPNotificationOpenedResult* notificationOpenedResult;
 
@@ -29,21 +30,25 @@ void processNotificationOpened(CPNotificationOpenedResult* result) {
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:objectData
                                                          options:NSJSONReadingMutableContainers
                                                            error:&jsonError];
-    if(!jsonError) {
+    if (!jsonError) {
         successCallback(notficationOpenedCallbackId, json);
         notificationOpenedResult = nil;
     }
 }
 
-void initCleverPushObject(NSDictionary* launchOptions, const char* channelId, BOOL autoPrompt) {
+void initCleverPushObject(NSDictionary* launchOptions, const char* channelId) {
     NSString* channelIdStr = (channelId ? [NSString stringWithUTF8String:channelId] : nil);
 
     [CleverPush initWithLaunchOptions:launchOptions channelId:channelIdStr handleNotificationOpened:^(CPNotificationOpenedResult* openResult) {
-            notificationOpenedResult = openResult;
-            if (pluginCommandDelegate) {
-                processNotificationOpened(openResult);
-            }
-        } settings:@{@"autoPrompt": @(autoPrompt)}];
+        notificationOpenedResult = openResult;
+        if (pluginCommandDelegate && notficationOpenedCallbackId != nil) {
+            processNotificationOpened(openResult);
+        }
+    } handleSubscribed:^(NSString *subscriptionId) {
+        if (pluginCommandDelegate && subscribedCallbackId != nil) {
+            successCallback(subscribedCallbackId, subscriptionId);
+        }
+    }];
 }
 
 @implementation CleverPushPlugin
@@ -52,26 +57,20 @@ void initCleverPushObject(NSDictionary* launchOptions, const char* channelId, BO
     notficationOpenedCallbackId = command.callbackId;
 }
 
+- (void)setSubscribedHandler:(CDVInvokedUrlCommand*)command {
+    subscribedCallbackId = command.callbackId;
+}
+
 - (void)init:(CDVInvokedUrlCommand*)command {
     pluginCommandDelegate = self.commandDelegate;
 
-    NSString* appId = (NSString*)command.arguments[0];
-    NSDictionary* settings = command.arguments[2] == [NSNull null] ? @{} : (NSDictionary*)command.arguments[2];
+    NSString* channelId = (NSString*)command.arguments[0];
 
-    BOOL autoPrompt = settings[@"autoPrompt"] ? [(NSNumber*)settings[@"autoPrompt"] boolValue] : YES;
+    initCleverPushObject(nil, [channelId UTF8String]);
 
-    int displayOption = [(NSNumber*)command.arguments[3] intValue];
-
-    initCleverPushObject(nil, [channelId UTF8String], autoPrompt, NO);
-
-    if (notification)
-        processNotificationReceived(notification);
-    if (notificationOpenedResult)
+    if (notificationOpenedResult) {
         processNotificationOpened(notificationOpenedResult);
-}
-
-- (void)registerForPushNotifications:(CDVInvokedUrlCommand*)command {
-    [CleverPush registerForPushNotifications];
+    }
 }
 
 @end

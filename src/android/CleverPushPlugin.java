@@ -1,4 +1,4 @@
-package com.plugin.gcm;
+package com.cleverpush.cordova;
 
 import android.app.Activity;
 import android.content.Context;
@@ -19,13 +19,10 @@ import java.util.Collection;
 import com.cleverpush.CleverPush;
 import com.cleverpush.NotificationOpenedResult;
 import com.cleverpush.listener.NotificationOpenedListener;
+import com.cleverpush.listener.SubscribedListener;
 
 public class CleverPushPlugin extends CordovaPlugin {
   public static final String TAG = "CleverPushPlugin";
-
-  public static final String INIT = "init";
-
-  private static CallbackContext notificationOpenedCallbackContext;
 
   private static void callbackSuccess(CallbackContext callbackContext, JSONObject jsonObject) {
     if (jsonObject == null) {
@@ -54,13 +51,12 @@ public class CleverPushPlugin extends CordovaPlugin {
   }
 
   @Override
-  public boolean execute(String action, JSONArray data, CallbackContext callbackContext) {
-    if (action.equals(INIT)) {
+  public boolean execute(String action, JSONArray data, CallbackContext openedContext, CallbackContext subscribedContext) {
+    if (action.equals("init")) {
       try {
         String channelId = data.getString(0);
-        notificationOpenedCallbackContext = callbackContext;
 
-        CleverPush.init(this.cordova.getActivity(), channelId, new CordovaNotificationOpenedHandler(notificationOpenedCallbackContext));
+        CleverPush.init(this.cordova.getActivity(), channelId, new CordovaNotificationOpenedHandler(openedContext), new CordovaSubscribedHandler(subscribedContext));
         return true;
       } catch (JSONException e) {
         Log.e(TAG, "execute: Got JSON Exception " + e.getMessage());
@@ -73,8 +69,7 @@ public class CleverPushPlugin extends CordovaPlugin {
     }
   }
 
-  private class CordovaNotificationOpenedHandler implements NotificationOpenedHandler {
-
+  private class CordovaNotificationOpenedHandler implements NotificationOpenedListener {
     private CallbackContext callbackContext;
 
     public CordovaNotificationOpenedHandler(CallbackContext callbackContext) {
@@ -84,15 +79,27 @@ public class CleverPushPlugin extends CordovaPlugin {
     @Override
     public void notificationOpened(NotificationOpenedResult result) {
       try {
-        callbackSuccess(callbackContext, new JSONObject(result.getData()));
+        callbackSuccess(callbackContext, new JSONObject(result.getNotification()));
       } catch (Throwable t) {
         t.printStackTrace();
       }
     }
   }
 
-  @Override
-  public void onDestroy() {
-    CleverPush.removeNotificationOpenedListener();
+  private class CordovaSubscribedHandler implements SubscribedListener {
+    private CallbackContext callbackContext;
+
+    public CordovaNotificationOpenedHandler(CallbackContext callbackContext) {
+      this.callbackContext = callbackContext;
+    }
+
+    @Override
+    public void subscribed(String subscriptionId) {
+      try {
+        callbackSuccess(callbackContext, subscriptionId);
+      } catch (Throwable t) {
+        t.printStackTrace();
+      }
+    }
   }
 }

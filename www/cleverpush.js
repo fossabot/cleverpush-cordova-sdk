@@ -1,7 +1,7 @@
 var CleverPush = function() {
 };
 
-CleverPush.prototype.init = function(channelId, notificationOpenedCallback, iOSSettings) {
+CleverPush.prototype.init = function(channelId, notificationOpenedCallback, subscribedCallback) {
   CleverPush._channelId = channelId;
 
   var args = [channelId];
@@ -10,20 +10,16 @@ CleverPush.prototype.init = function(channelId, notificationOpenedCallback, iOSS
   } else {
     args.push(function() {});
   }
-  if (typeof iOSSettings === 'object') {
-    args.push(iOSSettings);
+  if (typeof subscribedCallback === 'function') {
+    args.push(subscribedCallback);
+  } else {
+    args.push(function() {});
   }
 
-  cordova.exec(function() {}, function() {}, "CleverPush", "init", args);
+  cordova.exec(function() {}, function() {}, 'CleverPush', 'init', args);
 };
 
-// For iOS if autoPrompt is false
-CleverPush.prototype.registerForPushNotifications = function() {
-  cordova.exec(function() {}, function() {}, "CleverPush", "registerForPushNotifications", []);
-};
-
-
-if(!window.plugins) {
+if (!window.plugins) {
   window.plugins = {};
 }
 
@@ -31,6 +27,6 @@ if (!window.plugins.CleverPush) {
   window.plugins.CleverPush = new CleverPush();
 }
 
-if (typeof module != 'undefined' && module.exports) {
+if (typeof module !== 'undefined' && module.exports) {
   module.exports = CleverPush;
 }
