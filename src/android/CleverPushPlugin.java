@@ -89,7 +89,7 @@ public class CleverPushPlugin extends CordovaPlugin {
   private class CordovaSubscribedHandler implements SubscribedListener {
     private CallbackContext callbackContext;
 
-    public CordovaNotificationOpenedHandler(CallbackContext callbackContext) {
+    public CordovaSubscribedHandler(CallbackContext callbackContext) {
       this.callbackContext = callbackContext;
     }
 
