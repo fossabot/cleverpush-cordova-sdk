@@ -71,7 +71,7 @@ public class CleverPushPlugin extends CordovaPlugin {
       }
     } else {
       Log.e(TAG, "Invalid action: " + action);
-      callbackError(callbackContext, "Invalid action : " + action);
+      // callbackError(callbackContext, "Invalid action : " + action);
       return false;
     }
   }
