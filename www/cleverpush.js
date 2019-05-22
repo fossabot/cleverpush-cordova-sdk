@@ -5,14 +5,10 @@ CleverPush.prototype.init = function(channelId, notificationOpenedCallback, subs
   CleverPush._channelId = channelId;
 
   if (typeof notificationOpenedCallback === 'function') {
-    cordova.exec(function() {}, function() {}, 'CleverPush', 'setNotificationOpenedHandler', args);
-  } else {
-    args.push(function() {});
+    cordova.exec(notificationOpenedCallback, function() {}, 'CleverPush', 'setNotificationOpenedHandler');
   }
   if (typeof subscribedCallback === 'function') {
-    cordova.exec(function() {}, function() {}, 'CleverPush', 'setSubscribedHandler', args);
-  } else {
-    args.push(function() {});
+    cordova.exec(subscribedCallback, function() {}, 'CleverPush', 'setSubscribedHandler');
   }
 
   var args = [channelId];
