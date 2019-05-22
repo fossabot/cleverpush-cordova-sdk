@@ -68,7 +68,7 @@
 
         <config-file target="config.xml" parent="/*">
             <feature name="CleverPush">
-                <param name="ios-package" value="CleverPush"/>
+                <param name="ios-package" value="CleverPushPlugin" />
             </feature>
         </config-file>
 
