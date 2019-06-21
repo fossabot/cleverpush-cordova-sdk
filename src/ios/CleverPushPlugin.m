@@ -61,6 +61,52 @@ void initCleverPushObject(NSDictionary* launchOptions, const char* channelId) {
     }];
 }
 
+
+@implementation UIApplication(CleverPushCordovaPush)
+    static void injectSelector(Class newClass, SEL newSel, Class addToClass, SEL makeLikeSel) {
+        Method newMeth = class_getInstanceMethod(newClass, newSel);
+        IMP imp = method_getImplementation(newMeth);
+        const char* methodTypeEncoding = method_getTypeEncoding(newMeth);
+
+        BOOL successful = class_addMethod(addToClass, makeLikeSel, imp, methodTypeEncoding);
+        if (!successful) {
+            class_addMethod(addToClass, newSel, imp, methodTypeEncoding);
+            newMeth = class_getInstanceMethod(addToClass, newSel);
+
+            Method orgMeth = class_getInstanceMethod(addToClass, makeLikeSel);
+
+            method_exchangeImplementations(orgMeth, newMeth);
+        }
+    }
+
++ (void)load {
+    method_exchangeImplementations(class_getInstanceMethod(self, @selector(setDelegate:)), class_getInstanceMethod(self, @selector(setCleverPushCordovaDelegate:)));
+}
+
+static Class delegateClass = nil;
+
+- (void) setCleverPushCordovaDelegate:(id<UIApplicationDelegate>)delegate {
+    if(delegateClass != nil)
+    return;
+    delegateClass = [delegate class];
+
+    injectSelector(self.class, @selector(cleverPushApplication:didFinishLaunchingWithOptions:),
+                   delegateClass, @selector(application:didFinishLaunchingWithOptions:));
+    [self setCleverPushCordovaDelegate:delegate];
+}
+
+- (BOOL)cleverPushApplication:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary*)launchOptions {
+    initCleverPushObject(launchOptions, nil);
+
+    if ([self respondsToSelector:@selector(cleverPushApplication:didFinishLaunchingWithOptions:)]) {
+        return [self cleverPushApplication:application didFinishLaunchingWithOptions:launchOptions];
+    }
+    return YES;
+}
+
+@end
+
+
 @implementation CleverPushPlugin
 
 - (void)setNotificationOpenedHandler:(CDVInvokedUrlCommand*)command {
