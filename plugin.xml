@@ -56,7 +56,7 @@
 
     <platform name="ios">
 
-        <framework src="CleverPush" type="podspec" spec="~> 0.0.26" />
+        <framework src="CleverPush" type="podspec" spec="~> 0.1.0" />
 
         <pod name="CleverPush" />
 
