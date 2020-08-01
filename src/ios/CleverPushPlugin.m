@@ -4,7 +4,8 @@
 #import "CleverPushPlugin.h"
 #import <CleverPush/CleverPush.h>
 
-NSString* notficationOpenedCallbackId;
+NSString* notificationReceivedCallbackId;
+NSString* notificationOpenedCallbackId;
 NSString* subscribedCallbackId;
 
 CPNotificationOpenedResult* notificationOpenedResult;
@@ -27,10 +28,33 @@ NSString* stringifyNotificationOpenedResult(CPNotificationOpenedResult* result) 
     NSMutableDictionary* obj = [NSMutableDictionary new];
     [obj setObject:result.notification forKeyedSubscript:@"notification"];
     [obj setObject:result.subscription forKeyedSubscript:@"subscription"];
+    [obj setObject:result.action forKeyedSubscript:@"action"];
 
     NSError * err;
     NSData * jsonData = [NSJSONSerialization  dataWithJSONObject:obj options:0 error:&err];
     return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+}
+
+NSString* stringifyNotificationReceivedResult(CPNotificationReceivedResult* result) {
+    NSMutableDictionary* obj = [NSMutableDictionary new];
+    [obj setObject:result.notification forKeyedSubscript:@"notification"];
+    [obj setObject:result.subscription forKeyedSubscript:@"subscription"];
+
+    NSError * err;
+    NSData * jsonData = [NSJSONSerialization  dataWithJSONObject:obj options:0 error:&err];
+    return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+}
+
+void processNotificationReceived(CPNotificationReceivedResult* result) {
+    NSString* data = stringifyNotificationReceivedResult(result);
+    NSError *jsonError;
+    NSData *objectData = [data dataUsingEncoding:NSUTF8StringEncoding];
+    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:objectData
+                                                         options:NSJSONReadingMutableContainers
+                                                           error:&jsonError];
+    if (!jsonError) {
+        successCallback(notoficationReceivedCallbackId, json);
+    }
 }
 
 void processNotificationOpened(CPNotificationOpenedResult* result) {
@@ -41,7 +65,7 @@ void processNotificationOpened(CPNotificationOpenedResult* result) {
                                                          options:NSJSONReadingMutableContainers
                                                            error:&jsonError];
     if (!jsonError) {
-        successCallback(notficationOpenedCallbackId, json);
+        successCallback(notoficationOpenedCallbackId, json);
         notificationOpenedResult = nil;
     }
 }
@@ -49,16 +73,26 @@ void processNotificationOpened(CPNotificationOpenedResult* result) {
 void initCleverPushObject(NSDictionary* launchOptions, const char* channelId) {
     NSString* channelIdStr = (channelId ? [NSString stringWithUTF8String:channelId] : nil);
 
-    [CleverPush initWithLaunchOptions:launchOptions channelId:channelIdStr handleNotificationOpened:^(CPNotificationOpenedResult* openResult) {
-        notificationOpenedResult = openResult;
-        if (pluginCommandDelegate && notficationOpenedCallbackId != nil) {
-            processNotificationOpened(openResult);
+    [CleverPush
+        initWithLaunchOptions:launchOptions
+        channelId:channelIdStr
+        handleNotificationReceived:^(CPNotificationReceivedResult* receivedResult) {
+            if (pluginCommandDelegate && notificationReceivedCallbackId != nil) {
+                processNotificationReceived(receivedResult);
+            }
         }
-    } handleSubscribed:^(NSString *subscriptionId) {
-        if (pluginCommandDelegate && subscribedCallbackId != nil) {
-            successCallback(subscribedCallbackId, subscriptionId);
+        handleNotificationOpened:^(CPNotificationOpenedResult* openResult) {
+            notificationOpenedResult = openResult;
+            if (pluginCommandDelegate && notificationOpenedCallbackId != nil) {
+                processNotificationOpened(openResult);
+            }
         }
-    }];
+        handleSubscribed:^(NSString *subscriptionId) {
+            if (pluginCommandDelegate && subscribedCallbackId != nil) {
+                successCallback(subscribedCallbackId, subscriptionId);
+            }
+        }
+    ];
 }
 
 
@@ -109,8 +143,12 @@ static Class delegateClass = nil;
 
 @implementation CleverPushPlugin
 
+- (void)setNotificationReceivedHandler:(CDVInvokedUrlCommand*)command {
+    notificationReceivedCallbackId = command.callbackId;
+}
+
 - (void)setNotificationOpenedHandler:(CDVInvokedUrlCommand*)command {
-    notficationOpenedCallbackId = command.callbackId;
+    notificationOpenedCallbackId = command.callbackId;
 }
 
 - (void)setSubscribedHandler:(CDVInvokedUrlCommand*)command {

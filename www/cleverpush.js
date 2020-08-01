@@ -1,9 +1,21 @@
 var CleverPush = function() {
 };
 
-CleverPush.prototype.init = function(channelId, notificationOpenedCallback, subscribedCallback) {
+CleverPush.prototype.init = function(channelId, notificationReceivedCallback, notificationOpenedCallback, subscribedCallback) {
   CleverPush._channelId = channelId;
 
+  /*
+  if (typeof notificationOpenedCallback === 'undefined') {
+    notificationOpenedCallback = notificationReceivedCallback;
+    if (typeof subscribedCallback === 'undefined') {
+      subscribedCallback = notificationOpenedCallback;
+    }
+  }
+  */
+
+  if (typeof notificationReceivedCallback === 'function') {
+    cordova.exec(notificationReceivedCallback, function() {}, 'CleverPush', 'setNotificationReceivedHandler', []);
+  }
   if (typeof notificationOpenedCallback === 'function') {
     cordova.exec(notificationOpenedCallback, function() {}, 'CleverPush', 'setNotificationOpenedHandler', []);
   }

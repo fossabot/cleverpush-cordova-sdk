@@ -19,12 +19,14 @@ import java.util.Collection;
 
 import com.cleverpush.CleverPush;
 import com.cleverpush.NotificationOpenedResult;
+import com.cleverpush.listener.NotificationReceivedListener;
 import com.cleverpush.listener.NotificationOpenedListener;
 import com.cleverpush.listener.SubscribedListener;
 
 public class CleverPushPlugin extends CordovaPlugin {
   public static final String TAG = "CleverPushPlugin";
 
+  private static CallbackContext receivedCallbackContext;
   private static CallbackContext openedCallbackContext;
   private static CallbackContext subscribedCallbackContext;
 
@@ -66,22 +68,48 @@ public class CleverPushPlugin extends CordovaPlugin {
       try {
         String channelId = data.getString(0);
 
-        CleverPush.getInstance(this.cordova.getActivity()).init(channelId, new CordovaNotificationOpenedHandler(openedCallbackContext), new CordovaSubscribedHandler(subscribedCallbackContext));
+        CleverPush.getInstance(this.cordova.getActivity()).init(channelId, new CordovaNotificationReceivedHandler(receivedCallbackContext), new CordovaNotificationOpenedHandler(openedCallbackContext), new CordovaSubscribedHandler(subscribedCallbackContext));
         return true;
       } catch (Exception e) {
-        Log.e(TAG, "execute: Got Exception " + e.getMessage());
+        Log.e(TAG, "execute: Got Exception: " + e.getMessage());
         return false;
       }
+    } else if (action.equals("setNotificationReceivedHandler")) {
+      receivedCallbackContext = callbackContext;
+      return true;
     } else if (action.equals("setNotificationOpenedHandler")) {
-        openedCallbackContext = callbackContext;
-        return true;
+      openedCallbackContext = callbackContext;
+      return true;
     } else if (action.equals("setSubscribedHandler")) {
-        subscribedCallbackContext = callbackContext;
-        return true;
+      subscribedCallbackContext = callbackContext;
+      return true;
     } else {
       Log.e(TAG, "Invalid action: " + action);
-      callbackError(callbackContext, "Invalid action : " + action);
+      callbackError(callbackContext, "Invalid action: " + action);
       return false;
+    }
+  }
+
+  private class CordovaNotificationReceivedHandler implements NotificationReceivedListener {
+    private CallbackContext callbackContext;
+
+    public CordovaNotificationReceivedHandler(CallbackContext callbackContext) {
+      this.callbackContext = callbackContext;
+    }
+
+    @Override
+    public void notificationReceived(NotificationOpenedResult result) {
+      try {
+        Gson gson = new Gson();
+
+        JSONObject resultObj = new JSONObject();
+        resultObj.put("notification", new JSONObject(gson.toJson(result.getNotification())));
+        resultObj.put("subscription", new JSONObject(gson.toJson(result.getSubscription())));
+
+        callbackSuccess(callbackContext, resultObj);
+      } catch (Throwable t) {
+        t.printStackTrace();
+      }
     }
   }
 
