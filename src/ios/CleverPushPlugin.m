@@ -53,7 +53,7 @@ void processNotificationReceived(CPNotificationReceivedResult* result) {
                                                          options:NSJSONReadingMutableContainers
                                                            error:&jsonError];
     if (!jsonError) {
-        successCallback(notoficationReceivedCallbackId, json);
+        successCallback(notificationReceivedCallbackId, json);
     }
 }
 
@@ -65,7 +65,7 @@ void processNotificationOpened(CPNotificationOpenedResult* result) {
                                                          options:NSJSONReadingMutableContainers
                                                            error:&jsonError];
     if (!jsonError) {
-        successCallback(notoficationOpenedCallbackId, json);
+        successCallback(notificationOpenedCallbackId, json);
         notificationOpenedResult = nil;
     }
 }
