@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
         id="cleverpush-cordova-plugin"
-        version="1.0.1">
+        version="1.1.0">
 
     <name>CleverPush</name>
     <author>CleverPush GmbH</author>
@@ -25,7 +25,7 @@
 
     <platform name="android">
 
-        <framework src="com.cleverpush:cleverpush:1.3.0" />
+        <framework src="com.cleverpush:cleverpush:1.4.0" />
         <framework src="com.google.firebase:firebase-messaging:17+" />
         <framework src="com.google.code.gson:gson:2.8.6" />
 

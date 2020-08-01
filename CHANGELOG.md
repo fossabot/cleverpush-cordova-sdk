@@ -1,3 +1,7 @@
+# 1.1.0
+
+* Bump Android SDK version
+
 # 1.0.1
 
 * Typo fix
