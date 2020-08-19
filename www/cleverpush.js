@@ -27,6 +27,18 @@ CleverPush.prototype.init = function(channelId, notificationReceivedCallback, no
   cordova.exec(function() {}, function() {}, 'CleverPush', 'init', args);
 };
 
+CleverPush.prototype.subscribe = function() {
+  cordova.exec(function() {}, function() {}, 'CleverPush', 'subscribe', []);
+};
+
+CleverPush.prototype.unsubscribe = function() {
+  cordova.exec(function() {}, function() {}, 'CleverPush', 'unsubscribe', []);
+};
+
+CleverPush.prototype.showTopicsDialog = function() {
+  cordova.exec(function() {}, function() {}, 'CleverPush', 'showTopicsDialog', []);
+};
+
 if (!window.plugins) {
   window.plugins = {};
 }

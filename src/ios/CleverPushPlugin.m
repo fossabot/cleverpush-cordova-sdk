@@ -155,6 +155,18 @@ static Class delegateClass = nil;
     subscribedCallbackId = command.callbackId;
 }
 
+- (void)subscribe:(CDVInvokedUrlCommand*)command {
+    [CleverPush subscribe];
+}
+
+- (void)unsubscribe:(CDVInvokedUrlCommand*)command {
+    [CleverPush unsubscribe];
+}
+
+- (void)showTopicsDialog:(CDVInvokedUrlCommand*)command {
+    [CleverPush showTopicsDialog];
+}
+
 - (void)init:(CDVInvokedUrlCommand*)command {
     pluginCommandDelegate = self.commandDelegate;
 

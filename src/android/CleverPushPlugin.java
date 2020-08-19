@@ -68,7 +68,18 @@ public class CleverPushPlugin extends CordovaPlugin {
       try {
         String channelId = data.getString(0);
 
-        CleverPush.getInstance(this.cordova.getActivity()).init(channelId, new CordovaNotificationReceivedHandler(receivedCallbackContext), new CordovaNotificationOpenedHandler(openedCallbackContext), new CordovaSubscribedHandler(subscribedCallbackContext));
+        boolean autoRegister = true;
+        if (data.getBoolean("autoRegister")) {
+          autoRegister = true;
+        }
+
+        CleverPush.getInstance(this.cordova.getActivity()).init(
+          channelId,
+          new CordovaNotificationReceivedHandler(receivedCallbackContext),
+          new CordovaNotificationOpenedHandler(openedCallbackContext),
+          new CordovaSubscribedHandler(subscribedCallbackContext),
+          autoRegister
+        );
         return true;
       } catch (Exception e) {
         Log.e(TAG, "execute: Got Exception: " + e.getMessage());
@@ -82,6 +93,15 @@ public class CleverPushPlugin extends CordovaPlugin {
       return true;
     } else if (action.equals("setSubscribedHandler")) {
       subscribedCallbackContext = callbackContext;
+      return true;
+    } else if (action.equals("subscribe")) {
+      CleverPush.getInstance(this.cordova.getActivity()).subscribe();
+      return true;
+    } else if (action.equals("unsubscribe")) {
+      CleverPush.getInstance(this.cordova.getActivity()).unsubscribe();
+      return true;
+    } else if (action.equals("showTopicsDialog")) {
+      CleverPush.getInstance(this.cordova.getActivity()).showTopicsDialog();
       return true;
     } else {
       Log.e(TAG, "Invalid action: " + action);

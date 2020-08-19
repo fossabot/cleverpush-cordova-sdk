@@ -1,3 +1,8 @@
+# 1.2.0
+
+* Bump Android SDK version
+* Support new methods: subscribe, unsubscribe, showTopicsDialog
+
 # 1.1.0
 
 * Bump Android SDK version
