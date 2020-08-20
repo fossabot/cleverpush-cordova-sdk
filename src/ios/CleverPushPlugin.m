@@ -9,11 +9,18 @@ NSString* notificationOpenedCallbackId;
 NSString* subscribedCallbackId;
 
 CPNotificationOpenedResult* notificationOpenedResult;
+NSString* pendingSubscribedResult;
 
 id <CDVCommandDelegate> pluginCommandDelegate;
 
 void successCallback(NSString* callbackId, NSDictionary* data) {
     CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
+    commandResult.keepCallback = @1;
+    [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
+}
+
+void subscriptionCallback(NSString* callbackId, NSString* data) {
+    CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:data];
     commandResult.keepCallback = @1;
     [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
 }
@@ -89,7 +96,9 @@ void initCleverPushObject(NSDictionary* launchOptions, const char* channelId) {
         }
         handleSubscribed:^(NSString *subscriptionId) {
             if (pluginCommandDelegate && subscribedCallbackId != nil) {
-                successCallback(subscribedCallbackId, subscriptionId);
+                subscriptionCallback(subscribedCallbackId, subscriptionId);
+            } else {
+                pendingSubscribedResult = subscriptionId;
             }
         }
     ];
@@ -161,7 +170,12 @@ static Class delegateClass = nil;
     NSString* channelId = (NSString*)command.arguments[0];
 
     initCleverPushObject(nil, [channelId UTF8String]);
-
+    
+    if (pendingSubscribedResult) {
+        subscriptionCallback(subscribedCallbackId, pendingSubscribedResult);
+        pendingSubscribedResult = nil;
+    }
+    
     if (notificationOpenedResult) {
         processNotificationOpened(notificationOpenedResult);
     }
