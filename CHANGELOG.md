@@ -1,3 +1,7 @@
+# 1.4.0
+
+* Bump Android SDK version to 1.5.0
+
 # 1.3.0
 
 * iOS subscribed handler fix
