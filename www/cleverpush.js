@@ -4,15 +4,6 @@ var CleverPush = function() {
 CleverPush.prototype.init = function(channelId, notificationReceivedCallback, notificationOpenedCallback, subscribedCallback) {
   CleverPush._channelId = channelId;
 
-  /*
-  if (typeof notificationOpenedCallback === 'undefined') {
-    notificationOpenedCallback = notificationReceivedCallback;
-    if (typeof subscribedCallback === 'undefined') {
-      subscribedCallback = notificationOpenedCallback;
-    }
-  }
-  */
-
   if (typeof notificationReceivedCallback === 'function') {
     cordova.exec(notificationReceivedCallback, function() {}, 'CleverPush', 'setNotificationReceivedHandler', []);
   }
@@ -25,6 +16,10 @@ CleverPush.prototype.init = function(channelId, notificationReceivedCallback, no
 
   var args = [channelId];
   cordova.exec(function() {}, function() {}, 'CleverPush', 'init', args);
+};
+
+CleverPush.prototype.enableDevelopmentMode = function() {
+  cordova.exec(function() {}, function() {}, 'CleverPush', 'enableDevelopmentMode', []);
 };
 
 if (!window.plugins) {

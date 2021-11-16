@@ -1,3 +1,10 @@
+# 1.5.0
+
+* Bump Android SDK & iOS SDK versions
+
+# 1.4.2
+* Bump Android SDK version
+
 # 1.4.1
 
 * Bump Android SDK & iOS SDK versions

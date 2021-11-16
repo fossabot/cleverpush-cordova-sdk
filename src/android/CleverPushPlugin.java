@@ -83,6 +83,9 @@ public class CleverPushPlugin extends CordovaPlugin {
     } else if (action.equals("setSubscribedHandler")) {
       subscribedCallbackContext = callbackContext;
       return true;
+    } else if (action.equals("enableDevelopmentMode")) {
+      CleverPush.getInstance(this.cordova.getActivity()).enableDevelopmentMode();
+      return true;
     } else {
       Log.e(TAG, "Invalid action: " + action);
       callbackError(callbackContext, "Invalid action: " + action);

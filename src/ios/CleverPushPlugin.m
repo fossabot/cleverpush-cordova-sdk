@@ -11,6 +11,8 @@ NSString* subscribedCallbackId;
 CPNotificationOpenedResult* notificationOpenedResult;
 NSString* pendingSubscribedResult;
 
+NSDictionary* pendingLaunchOptions;
+
 id <CDVCommandDelegate> pluginCommandDelegate;
 
 void successCallback(NSString* callbackId, NSDictionary* data) {
@@ -31,24 +33,51 @@ void failureCallback(NSString* callbackId, NSDictionary* data) {
     [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
 }
 
+NSDictionary* dictionaryWithPropertiesOfObject(id obj) {
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+
+    unsigned count;
+    objc_property_t *properties = class_copyPropertyList([obj class], &count);
+    
+    for (int i = 0; i < count; i++) {
+        NSString *key = [NSString stringWithUTF8String:property_getName(properties[i])];
+        if ([obj valueForKey:key] != nil) {
+            if ([[obj valueForKey:key] isKindOfClass:[NSDate class]]) {
+                NSString *convertedDateString = [NSString stringWithFormat:@"%@", [obj valueForKey:key]];
+                [dict setObject:convertedDateString forKey:key];
+            } else {
+                [dict setObject:[obj valueForKey:key] forKey:key];
+            }
+        }
+    }
+    free(properties);
+    return [NSDictionary dictionaryWithDictionary:dict];
+}
+
 NSString* stringifyNotificationOpenedResult(CPNotificationOpenedResult* result) {
+    NSDictionary *notificationDictionary = dictionaryWithPropertiesOfObject(result.notification);
+    NSDictionary *subscriptionDictionary = dictionaryWithPropertiesOfObject(result.subscription);
+
     NSMutableDictionary* obj = [NSMutableDictionary new];
-    [obj setObject:result.notification forKeyedSubscript:@"notification"];
-    [obj setObject:result.subscription forKeyedSubscript:@"subscription"];
+    [obj setObject:notificationDictionary forKeyedSubscript:@"notification"];
+    [obj setObject:subscriptionDictionary forKeyedSubscript:@"subscription"];
     [obj setObject:result.action forKeyedSubscript:@"action"];
 
-    NSError * err;
-    NSData * jsonData = [NSJSONSerialization  dataWithJSONObject:obj options:0 error:&err];
+    NSError *err;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:obj options:0 error:&err];
     return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 }
 
 NSString* stringifyNotificationReceivedResult(CPNotificationReceivedResult* result) {
-    NSMutableDictionary* obj = [NSMutableDictionary new];
-    [obj setObject:result.notification forKeyedSubscript:@"notification"];
-    [obj setObject:result.subscription forKeyedSubscript:@"subscription"];
+    NSDictionary *notificationDictionary = dictionaryWithPropertiesOfObject(result.notification);
+    NSDictionary *subscriptionDictionary = dictionaryWithPropertiesOfObject(result.subscription);
 
-    NSError * err;
-    NSData * jsonData = [NSJSONSerialization  dataWithJSONObject:obj options:0 error:&err];
+    NSMutableDictionary* obj = [NSMutableDictionary new];
+    [obj setObject:notificationDictionary forKeyedSubscript:@"notification"];
+    [obj setObject:subscriptionDictionary forKeyedSubscript:@"subscription"];
+
+    NSError *err;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:obj options:0 error:&err];
     return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 }
 
@@ -79,7 +108,7 @@ void processNotificationOpened(CPNotificationOpenedResult* result) {
 
 void initCleverPushObject(NSDictionary* launchOptions, const char* channelId) {
     NSString* channelIdStr = (channelId ? [NSString stringWithUTF8String:channelId] : nil);
-
+    
     [CleverPush
         initWithLaunchOptions:launchOptions
         channelId:channelIdStr
@@ -134,13 +163,13 @@ static Class delegateClass = nil;
     delegateClass = [delegate class];
 
     injectSelector(self.class, @selector(cleverPushApplication:didFinishLaunchingWithOptions:),
-                   delegateClass, @selector(application:didFinishLaunchingWithOptions:));
+                  delegateClass, @selector(application:didFinishLaunchingWithOptions:));
     [self setCleverPushCordovaDelegate:delegate];
 }
 
 - (BOOL)cleverPushApplication:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary*)launchOptions {
-    initCleverPushObject(launchOptions, nil);
-
+    pendingLaunchOptions = launchOptions;
+    
     if ([self respondsToSelector:@selector(cleverPushApplication:didFinishLaunchingWithOptions:)]) {
         return [self cleverPushApplication:application didFinishLaunchingWithOptions:launchOptions];
     }
@@ -169,8 +198,8 @@ static Class delegateClass = nil;
 
     NSString* channelId = (NSString*)command.arguments[0];
 
-    initCleverPushObject(nil, [channelId UTF8String]);
-    
+    initCleverPushObject(pendingLaunchOptions, [channelId UTF8String]);
+
     if (pendingSubscribedResult) {
         subscriptionCallback(subscribedCallbackId, pendingSubscribedResult);
         pendingSubscribedResult = nil;
@@ -179,6 +208,10 @@ static Class delegateClass = nil;
     if (notificationOpenedResult) {
         processNotificationOpened(notificationOpenedResult);
     }
+}
+
+- (void)enableDevelopmentMode:(CDVInvokedUrlCommand*)command {
+    [CleverPush enableDevelopmentMode];
 }
 
 @end
