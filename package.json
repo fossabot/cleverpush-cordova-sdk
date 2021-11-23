@@ -1,6 +1,6 @@
 {
   "name": "cleverpush-cordova-sdk",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "CleverPush Cordova plugin",
   "cordova": {
     "id": "com.cleverpush.cordova.sdk",

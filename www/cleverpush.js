@@ -1,21 +1,41 @@
 var CleverPush = function() {
 };
 
-CleverPush.prototype.init = function(channelId, notificationReceivedCallback, notificationOpenedCallback, subscribedCallback) {
+CleverPush.prototype.init = function(channelId, notificationReceivedListener, notificationOpenedListener, subscribedListener) {
   CleverPush._channelId = channelId;
 
-  if (typeof notificationReceivedCallback === 'function') {
-    cordova.exec(notificationReceivedCallback, function() {}, 'CleverPush', 'setNotificationReceivedHandler', []);
+  if (typeof notificationReceivedListener === 'function') {
+    cordova.exec(notificationReceivedListener, function() {}, 'CleverPush', 'setNotificationReceivedHandler', []);
   }
-  if (typeof notificationOpenedCallback === 'function') {
-    cordova.exec(notificationOpenedCallback, function() {}, 'CleverPush', 'setNotificationOpenedHandler', []);
+  if (typeof notificationOpenedListener === 'function') {
+    cordova.exec(notificationOpenedListener, function() {}, 'CleverPush', 'setNotificationOpenedHandler', []);
   }
-  if (typeof subscribedCallback === 'function') {
-    cordova.exec(subscribedCallback, function() {}, 'CleverPush', 'setSubscribedHandler', []);
+  if (typeof subscribedListener === 'function') {
+    cordova.exec(subscribedListener, function() {}, 'CleverPush', 'setSubscribedHandler', []);
   }
 
   var args = [channelId];
   cordova.exec(function() {}, function() {}, 'CleverPush', 'init', args);
+};
+
+CleverPush.prototype.setNotificationReceivedListener = function(notificationReceivedListener) {
+  cordova.exec(notificationReceivedListener, function() {}, 'CleverPush', 'setNotificationReceivedHandler', []);
+};
+
+// Only for Android
+CleverPush.prototype.setNotificationReceivedCallbackListener = function(notificationReceivedListener) {
+  cordova.exec(notificationReceivedListener, function() {}, 'CleverPush', 'setNotificationReceivedCallbackHandler', []);
+};
+CleverPush.prototype.setNotificationReceivedCallbackResult = function(notificationId, showInForeground) {
+  cordova.exec(function() {}, function() {}, 'CleverPush', 'setNotificationReceivedCallbackResult', [notificationId, showInForeground]);
+};
+
+CleverPush.prototype.setNotificationOpenedListener = function(notificationOpenedListener) {
+  cordova.exec(notificationOpenedListener, function() {}, 'CleverPush', 'setNotificationOpenedHandler', []);
+};
+
+CleverPush.prototype.setSubscribedListener = function(subscribedListener) {
+  cordova.exec(subscribedListener, function() {}, 'CleverPush', 'setSubscribedHandler', []);
 };
 
 CleverPush.prototype.enableDevelopmentMode = function() {
