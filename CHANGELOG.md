@@ -1,3 +1,6 @@
+# 1.6.1
+* Bump Android SDK version
+
 # 1.6.0
 * Support `NotificationReceivedCallbackListner` to define if notification should be visible when app is in foreground (Android).
 * Added setter methods for NotificationReceived, NotificationOpened and Subscribed listeners
