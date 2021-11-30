@@ -1,3 +1,6 @@
+# 1.6.2
+* Bump Android SDK version
+
 # 1.6.1
 * Bump Android SDK version
 

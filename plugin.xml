@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
         id="cleverpush-cordova-plugin"
-        version="1.6.1">
+        version="1.6.2">
 
     <name>CleverPush</name>
     <author>CleverPush GmbH</author>
@@ -24,7 +24,7 @@
     </engines>
 
     <platform name="android">
-        <framework src="com.cleverpush:cleverpush:1.18.3" />
+        <framework src="com.cleverpush:cleverpush:1.18.9" />
 
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="CleverPush" >
