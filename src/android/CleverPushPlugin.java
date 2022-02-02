@@ -70,6 +70,7 @@ public class CleverPushPlugin extends CordovaPlugin {
       case "init":
         try {
           String channelId = data.getString(0);
+          boolean autoRegister = data.optBoolean(1, true);
 
           NotificationReceivedListener receivedListener = null;
           if (receivedCallbackContext != null) {
@@ -85,10 +86,11 @@ public class CleverPushPlugin extends CordovaPlugin {
           }
 
           CleverPush.getInstance(this.cordova.getActivity()).init(
-                  channelId,
-                  receivedListener,
-                  openedListener,
-                  subscribedListener
+            channelId,
+            receivedListener,
+            openedListener,
+            subscribedListener,
+            autoRegister
           );
           return true;
         } catch (Exception e) {
@@ -115,6 +117,12 @@ public class CleverPushPlugin extends CordovaPlugin {
         return true;
       case "enableDevelopmentMode":
         CleverPush.getInstance(this.cordova.getActivity()).enableDevelopmentMode();
+        return true;
+      case "subscribe":
+        CleverPush.getInstance(this.cordova.getActivity()).subscribe();
+        return true;
+      case "unsubscribe":
+        CleverPush.getInstance(this.cordova.getActivity()).unsubscribe();
         return true;
       default:
         Log.e(TAG, "Invalid action: " + action);

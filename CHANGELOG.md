@@ -1,3 +1,8 @@
+# 1.7.0
+* Bump Android SDK version
+* Implemented `subscribe` and `unsubscribe` method
+* Added `autoRegister` parameter to `init` method
+
 # 1.6.2
 * Bump Android SDK version
 

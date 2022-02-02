@@ -9,5 +9,7 @@
 - (void)setSubscribedHandler:(CDVInvokedUrlCommand*)command;
 - (void)init:(CDVInvokedUrlCommand*)command;
 - (void)enableDevelopmentMode:(CDVInvokedUrlCommand*)command;
+- (void)subscribe:(CDVInvokedUrlCommand*)command;
+- (void)unsubscribe:(CDVInvokedUrlCommand*)command;
 
 @end

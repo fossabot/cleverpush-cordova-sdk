@@ -106,7 +106,7 @@ void processNotificationOpened(CPNotificationOpenedResult* result) {
     }
 }
 
-void initCleverPushObject(NSDictionary* launchOptions, const char* channelId) {
+void initCleverPushObject(NSDictionary* launchOptions, const char* channelId, BOOL autoRegister) {
     NSString* channelIdStr = (channelId ? [NSString stringWithUTF8String:channelId] : nil);
     
     [CleverPush
@@ -130,6 +130,7 @@ void initCleverPushObject(NSDictionary* launchOptions, const char* channelId) {
                 pendingSubscribedResult = subscriptionId;
             }
         }
+        autoRegister:autoRegister
     ];
 }
 
@@ -197,8 +198,12 @@ static Class delegateClass = nil;
     pluginCommandDelegate = self.commandDelegate;
 
     NSString* channelId = (NSString*)command.arguments[0];
+    BOOL autoRegister = YES;
+    if ([command.arguments count] > 1) {
+        autoRegister = [(NSNumber*)command.arguments[1] boolValue];
+    }
 
-    initCleverPushObject(pendingLaunchOptions, [channelId UTF8String]);
+    initCleverPushObject(pendingLaunchOptions, [channelId UTF8String], autoRegister);
 
     if (pendingSubscribedResult) {
         subscriptionCallback(subscribedCallbackId, pendingSubscribedResult);
@@ -212,6 +217,14 @@ static Class delegateClass = nil;
 
 - (void)enableDevelopmentMode:(CDVInvokedUrlCommand*)command {
     [CleverPush enableDevelopmentMode];
+}
+
+- (void)subscribe:(CDVInvokedUrlCommand*)command {
+    [CleverPush subscribe];
+}
+
+- (void)unsubscribe:(CDVInvokedUrlCommand*)command {
+    [CleverPush unsubscribe];
 }
 
 @end

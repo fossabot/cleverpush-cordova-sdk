@@ -1,7 +1,7 @@
 var CleverPush = function() {
 };
 
-CleverPush.prototype.init = function(channelId, notificationReceivedListener, notificationOpenedListener, subscribedListener) {
+CleverPush.prototype.init = function(channelId, notificationReceivedListener, notificationOpenedListener, subscribedListener, autoRegisterParam) {
   CleverPush._channelId = channelId;
 
   if (typeof notificationReceivedListener === 'function') {
@@ -14,7 +14,10 @@ CleverPush.prototype.init = function(channelId, notificationReceivedListener, no
     cordova.exec(subscribedListener, function() {}, 'CleverPush', 'setSubscribedHandler', []);
   }
 
-  var args = [channelId];
+  var autoRegister = typeof autoRegisterParam === 'undefined' ? true : autoRegisterParam;
+
+  var args = [channelId, autoRegister];
+
   cordova.exec(function() {}, function() {}, 'CleverPush', 'init', args);
 };
 
@@ -40,6 +43,14 @@ CleverPush.prototype.setSubscribedListener = function(subscribedListener) {
 
 CleverPush.prototype.enableDevelopmentMode = function() {
   cordova.exec(function() {}, function() {}, 'CleverPush', 'enableDevelopmentMode', []);
+};
+
+CleverPush.prototype.subscribe = function() {
+  cordova.exec(function() {}, function() {}, 'CleverPush', 'subscribe', []);
+};
+
+CleverPush.prototype.unsubscribe = function() {
+  cordova.exec(function() {}, function() {}, 'CleverPush', 'unsubscribe', []);
 };
 
 if (!window.plugins) {
