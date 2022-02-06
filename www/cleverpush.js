@@ -53,6 +53,10 @@ CleverPush.prototype.unsubscribe = function() {
   cordova.exec(function() {}, function() {}, 'CleverPush', 'unsubscribe', []);
 };
 
+CleverPush.prototype.isSubscribed = function(callback) {
+  cordova.exec(callback, function() {}, 'CleverPush', 'isSubscribed', []);
+};
+
 if (!window.plugins) {
   window.plugins = {};
 }

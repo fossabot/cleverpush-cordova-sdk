@@ -21,6 +21,12 @@ void successCallback(NSString* callbackId, NSDictionary* data) {
     [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
 }
 
+void booleanSuccessCallback(NSString* callbackId, BOOL data) {
+    CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:data];
+    commandResult.keepCallback = @1;
+    [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
+}
+
 void subscriptionCallback(NSString* callbackId, NSString* data) {
     CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:data];
     commandResult.keepCallback = @1;
@@ -225,6 +231,11 @@ static Class delegateClass = nil;
 
 - (void)unsubscribe:(CDVInvokedUrlCommand*)command {
     [CleverPush unsubscribe];
+}
+
+- (void)isSubscribed:(CDVInvokedUrlCommand*)command {
+    BOOL isSubscribed = [CleverPush isSubscribed];
+    booleanSuccessCallback(command.callbackId, isSubscribed);
 }
 
 @end

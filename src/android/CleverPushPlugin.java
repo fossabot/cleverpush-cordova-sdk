@@ -47,6 +47,12 @@ public class CleverPushPlugin extends CordovaPlugin {
     callbackContext.sendPluginResult(pluginResult);
   }
 
+  private static void callbackSuccess(CallbackContext callbackContext, boolean resultBoolean) {
+    PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, resultBoolean);
+    pluginResult.setKeepCallback(true);
+    callbackContext.sendPluginResult(pluginResult);
+  }
+
   private static void callbackError(CallbackContext callbackContext, JSONObject jsonObject) {
     if (jsonObject == null) {
       jsonObject = new JSONObject();
@@ -123,6 +129,10 @@ public class CleverPushPlugin extends CordovaPlugin {
         return true;
       case "unsubscribe":
         CleverPush.getInstance(this.cordova.getActivity()).unsubscribe();
+        return true;
+      case "isSubscribed":
+        boolean isSubscribed = CleverPush.getInstance(this.cordova.getActivity()).isSubscribed();
+        callbackSuccess(callbackContext, isSubscribed);
         return true;
       default:
         Log.e(TAG, "Invalid action: " + action);

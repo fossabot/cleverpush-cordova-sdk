@@ -11,5 +11,6 @@
 - (void)enableDevelopmentMode:(CDVInvokedUrlCommand*)command;
 - (void)subscribe:(CDVInvokedUrlCommand*)command;
 - (void)unsubscribe:(CDVInvokedUrlCommand*)command;
+- (void)isSubscribed:(CDVInvokedUrlCommand*)command;
 
 @end

@@ -1,3 +1,6 @@
+# 1.7.1
+* Added `isSubscribed` method
+
 # 1.7.0
 * Bump Android SDK version
 * Implemented `subscribe` and `unsubscribe` method
