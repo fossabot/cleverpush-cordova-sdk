@@ -123,6 +123,8 @@ public class CleverPushPlugin extends CordovaPlugin {
         return true;
       case "enableDevelopmentMode":
         CleverPush.getInstance(this.cordova.getActivity()).enableDevelopmentMode();
+      case "showTopicsDialog":
+        CleverPush.getInstance(this.cordova.getActivity()).showTopicsDialog();
         return true;
       case "subscribe":
         CleverPush.getInstance(this.cordova.getActivity()).subscribe();

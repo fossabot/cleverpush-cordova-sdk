@@ -45,6 +45,10 @@ CleverPush.prototype.enableDevelopmentMode = function() {
   cordova.exec(function() {}, function() {}, 'CleverPush', 'enableDevelopmentMode', []);
 };
 
+CleverPush.prototype.showTopicsDialog = function() {
+  cordova.exec(function() {}, function() {}, 'CleverPush', 'showTopicsDialog', []);
+};
+
 CleverPush.prototype.subscribe = function() {
   cordova.exec(function() {}, function() {}, 'CleverPush', 'subscribe', []);
 };

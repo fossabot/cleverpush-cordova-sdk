@@ -1,3 +1,9 @@
+# 1.7.3
+* Added `showTopicsDialog` method
+
+# 1.7.2
+* Bump iOS & Android SDK version
+
 # 1.7.1
 * Added `isSubscribed` method
 

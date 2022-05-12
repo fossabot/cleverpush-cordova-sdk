@@ -225,6 +225,10 @@ static Class delegateClass = nil;
     [CleverPush enableDevelopmentMode];
 }
 
+- (void)showTopicsDialog:(CDVInvokedUrlCommand*)command {
+    [CleverPush showTopicsDialog];
+}
+
 - (void)subscribe:(CDVInvokedUrlCommand*)command {
     [CleverPush subscribe];
 }
