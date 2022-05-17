@@ -26,6 +26,10 @@ public class CleverPushPlugin extends CordovaPlugin {
   private static CallbackContext receivedCallbackContext;
   private static CallbackContext openedCallbackContext;
   private static CallbackContext subscribedCallbackContext;
+  private CleverPush cleverPush;
+  private static JSONObject pendingNotificationOpenedResult;
+
+  private CordovaNotificationOpenedHandler openedListener;
 
   private static final HashMap<String, Boolean> notificationReceivedCallbackResults = new HashMap<>();
   private static final HashMap<String, CountDownLatch> notificationReceivedCallbackLocks = new HashMap<>();
@@ -75,28 +79,31 @@ public class CleverPushPlugin extends CordovaPlugin {
     switch (action) {
       case "init":
         try {
+          this.cleverPush = CleverPush.getInstance(this.cordova.getActivity());
+
           String channelId = data.getString(0);
           boolean autoRegister = data.optBoolean(1, true);
 
-          NotificationReceivedListener receivedListener = null;
+          CordovaNotificationReceivedHandler receivedListener = null;
           if (receivedCallbackContext != null) {
             receivedListener = new CordovaNotificationReceivedHandler(receivedCallbackContext);
           }
-          NotificationOpenedListener openedListener = null;
+          this.openedListener = null;
           if (openedCallbackContext != null) {
-            openedListener = new CordovaNotificationOpenedHandler(openedCallbackContext);
+            this.openedListener = new CordovaNotificationOpenedHandler();
+            this.openedListener.setCallbackContext(openedCallbackContext);
           }
-          SubscribedListener subscribedListener = null;
+          CordovaSubscribedHandler subscribedListener = null;
           if (subscribedCallbackContext != null) {
             subscribedListener = new CordovaSubscribedHandler(subscribedCallbackContext);
           }
 
-          CleverPush.getInstance(this.cordova.getActivity()).init(
-            channelId,
-            receivedListener,
-            openedListener,
-            subscribedListener,
-            autoRegister
+          this.cleverPush.init(
+                  channelId,
+                  receivedListener,
+                  this.openedListener,
+                  subscribedListener,
+                  autoRegister
           );
           return true;
         } catch (Exception e) {
@@ -117,6 +124,9 @@ public class CleverPushPlugin extends CordovaPlugin {
         return true;
       case "setNotificationOpenedHandler":
         openedCallbackContext = callbackContext;
+        if (this.openedListener != null) {
+          this.openedListener.setCallbackContext(callbackContext);
+        }
         return true;
       case "setSubscribedHandler":
         subscribedCallbackContext = callbackContext;
@@ -152,7 +162,7 @@ public class CleverPushPlugin extends CordovaPlugin {
   }
 
   private class CordovaNotificationReceivedHandler implements NotificationReceivedListener {
-    private final CallbackContext callbackContext;
+    private CallbackContext callbackContext;
 
     public CordovaNotificationReceivedHandler(CallbackContext callbackContext) {
       this.callbackContext = callbackContext;
@@ -212,10 +222,22 @@ public class CleverPushPlugin extends CordovaPlugin {
   }
 
   private class CordovaNotificationOpenedHandler implements NotificationOpenedListener {
-    private final CallbackContext callbackContext;
+    private CallbackContext callbackContext;
 
-    public CordovaNotificationOpenedHandler(CallbackContext callbackContext) {
+    public CordovaNotificationOpenedHandler() {
+    }
+
+    public void setCallbackContext(CallbackContext callbackContext) {
       this.callbackContext = callbackContext;
+
+      if (pendingNotificationOpenedResult != null && callbackContext != null) {
+        try {
+          callbackSuccess(callbackContext, pendingNotificationOpenedResult);
+        } catch (Throwable t) {
+          Log.d(TAG, "notificationOpened pendingResult failed:", t);
+        }
+        pendingNotificationOpenedResult = null;
+      }
     }
 
     @Override
@@ -227,9 +249,17 @@ public class CleverPushPlugin extends CordovaPlugin {
         resultObj.put("notification", new JSONObject(gson.toJson(result.getNotification())));
         resultObj.put("subscription", new JSONObject(gson.toJson(result.getSubscription())));
 
+        // Cordova might destroy the webview and throw an error here. We will save the pending result and trigger it again if the callback will be called again.
+        if (cleverPush != null && !cleverPush.isAppOpen()) {
+          pendingNotificationOpenedResult = resultObj;
+          Log.d(TAG, "notificationOpened saving pendingResult");
+          return;
+        }
+
+        Log.d(TAG, "notificationOpened called");
         callbackSuccess(callbackContext, resultObj);
       } catch (Throwable t) {
-        t.printStackTrace();
+        Log.d(TAG, "notificationOpened failed:", t);
       }
     }
   }
