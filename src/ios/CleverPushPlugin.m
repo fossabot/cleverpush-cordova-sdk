@@ -7,6 +7,7 @@
 NSString* notificationReceivedCallbackId;
 NSString* notificationOpenedCallbackId;
 NSString* subscribedCallbackId;
+NSString* appBannerOpenedCallbackId;
 
 CPNotificationOpenedResult* notificationOpenedResult;
 NSString* pendingSubscribedResult;
@@ -87,6 +88,13 @@ NSString* stringifyNotificationReceivedResult(CPNotificationReceivedResult* resu
     return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 }
 
+NSString* stringifyAppBannerAction(CPAppBannerAction* action) {
+    NSDictionary *actionDictionary = dictionaryWithPropertiesOfObject(action);
+    NSError *err;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:actionDictionary options:0 error:&err];
+    return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+}
+
 void processNotificationReceived(CPNotificationReceivedResult* result) {
     NSString* data = stringifyNotificationReceivedResult(result);
     NSError *jsonError;
@@ -109,6 +117,18 @@ void processNotificationOpened(CPNotificationOpenedResult* result) {
     if (!jsonError) {
         successCallback(notificationOpenedCallbackId, json);
         notificationOpenedResult = nil;
+    }
+}
+
+void processAppBannerOpened(CPAppBannerAction* action) {
+    NSString* data = stringifyAppBannerAction(action);
+    NSError *jsonError;
+    NSData *objectData = [data dataUsingEncoding:NSUTF8StringEncoding];
+    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:objectData
+                                                         options:NSJSONReadingMutableContainers
+                                                           error:&jsonError];
+    if (!jsonError) {
+        successCallback(appBannerOpenedCallbackId, json);
     }
 }
 
@@ -138,6 +158,12 @@ void initCleverPushObject(NSDictionary* launchOptions, const char* channelId, BO
         }
         autoRegister:autoRegister
     ];
+
+    [CleverPush setAppBannerOpenedCallback:^(CPAppBannerAction *action) {
+        if (pluginCommandDelegate && appBannerOpenedCallbackId != nil) {
+            processAppBannerOpened(action);
+        }
+    }];
 }
 
 
@@ -198,6 +224,10 @@ static Class delegateClass = nil;
 
 - (void)setSubscribedHandler:(CDVInvokedUrlCommand*)command {
     subscribedCallbackId = command.callbackId;
+}
+
+- (void)setAppBannerOpenedHandler:(CDVInvokedUrlCommand*)command {
+    appBannerOpenedCallbackId = command.callbackId;
 }
 
 - (void)init:(CDVInvokedUrlCommand*)command {

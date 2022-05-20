@@ -4,10 +4,12 @@ import android.util.Log;
 
 import com.cleverpush.CleverPush;
 import com.cleverpush.NotificationOpenedResult;
+import com.cleverpush.banner.models.BannerAction;
 import com.cleverpush.listener.NotificationOpenedListener;
 import com.cleverpush.listener.NotificationReceivedCallbackListener;
 import com.cleverpush.listener.NotificationReceivedListener;
 import com.cleverpush.listener.SubscribedListener;
+import com.cleverpush.listener.AppBannerOpenedListener;
 import com.google.gson.Gson;
 
 import org.apache.cordova.CallbackContext;
@@ -26,6 +28,7 @@ public class CleverPushPlugin extends CordovaPlugin {
   private static CallbackContext receivedCallbackContext;
   private static CallbackContext openedCallbackContext;
   private static CallbackContext subscribedCallbackContext;
+  private static CallbackContext appBannerOpenedCallbackContext;
   private CleverPush cleverPush;
   private static JSONObject pendingNotificationOpenedResult;
 
@@ -105,6 +108,11 @@ public class CleverPushPlugin extends CordovaPlugin {
                   subscribedListener,
                   autoRegister
           );
+
+          this.cleverPush.setAppBannerOpenedListener(
+            new CordovaAppBannerOpenedHandler()
+          );
+
           return true;
         } catch (Exception e) {
           Log.e(TAG, "execute: Got Exception: " + e.getMessage());
@@ -130,6 +138,9 @@ public class CleverPushPlugin extends CordovaPlugin {
         return true;
       case "setSubscribedHandler":
         subscribedCallbackContext = callbackContext;
+        return true;
+      case "setAppBannerOpenedHandler":
+        appBannerOpenedCallbackContext = callbackContext;
         return true;
       case "enableDevelopmentMode":
         CleverPush.getInstance(this.cordova.getActivity()).enableDevelopmentMode();
@@ -179,7 +190,7 @@ public class CleverPushPlugin extends CordovaPlugin {
 
         callbackSuccess(callbackContext, resultObj);
       } catch (Throwable t) {
-        t.printStackTrace();
+        Log.e(TAG, "Error while executing notification received callback", t);
       }
     }
   }
@@ -215,7 +226,7 @@ public class CleverPushPlugin extends CordovaPlugin {
 
         return notificationCallbackResult;
       } catch (Throwable t) {
-        t.printStackTrace();
+        Log.e(TAG, "Error while executing notification received callback", t);
         return false;
       }
     }
@@ -276,7 +287,26 @@ public class CleverPushPlugin extends CordovaPlugin {
       try {
         callbackSuccess(callbackContext, subscriptionId);
       } catch (Throwable t) {
-        t.printStackTrace();
+        Log.e(TAG, "Error while executing subscribed callback", t);
+      }
+    }
+  }
+
+  private class CordovaAppBannerOpenedHandler implements AppBannerOpenedListener {
+    @Override
+    public void opened(BannerAction action) {
+      try {
+        if (appBannerOpenedCallbackContext != null) {
+          JSONObject resultObj = new JSONObject();
+          resultObj.put("type", action.getType());
+          resultObj.put("name", action.getName());
+          resultObj.put("url", action.getUrl());
+          resultObj.put("getUrlType", action.getUrlType());
+          resultObj.put("openInWebView", action.isOpenInWebView());
+          callbackSuccess(appBannerOpenedCallbackContext, resultObj);
+        }
+      } catch (Throwable t) {
+        Log.e(TAG, "Error while executing app banner opened callback", t);
       }
     }
   }

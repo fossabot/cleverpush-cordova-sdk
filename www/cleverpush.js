@@ -41,6 +41,10 @@ CleverPush.prototype.setSubscribedListener = function(subscribedListener) {
   cordova.exec(subscribedListener, function() {}, 'CleverPush', 'setSubscribedHandler', []);
 };
 
+CleverPush.prototype.setAppBannerOpenedListener = function(subscribedListener) {
+  cordova.exec(subscribedListener, function() {}, 'CleverPush', 'setAppBannerOpenedHandler', []);
+};
+
 CleverPush.prototype.enableDevelopmentMode = function() {
   cordova.exec(function() {}, function() {}, 'CleverPush', 'enableDevelopmentMode', []);
 };

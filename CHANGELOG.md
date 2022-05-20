@@ -1,3 +1,6 @@
+# 1.7.5
+* Support `setAppBannerOpenedListener`
+
 # 1.7.4
 * Fixed bug where notification listeners were not working in newer capacitor versions.
 

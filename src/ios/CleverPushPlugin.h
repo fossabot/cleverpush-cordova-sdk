@@ -7,6 +7,7 @@
 - (void)setNotificationOpenedHandler:(CDVInvokedUrlCommand*)command;
 - (void)setNotificationReceivedHandler:(CDVInvokedUrlCommand*)command;
 - (void)setSubscribedHandler:(CDVInvokedUrlCommand*)command;
+- (void)setAppBannerOpenedHandler:(CDVInvokedUrlCommand*)command;
 - (void)init:(CDVInvokedUrlCommand*)command;
 - (void)enableDevelopmentMode:(CDVInvokedUrlCommand*)command;
 - (void)showTopicsDialog:(CDVInvokedUrlCommand*)command;
