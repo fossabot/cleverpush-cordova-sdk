@@ -34,8 +34,8 @@ void subscriptionCallback(NSString* callbackId, NSString* data) {
     [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
 }
 
-void failureCallback(NSString* callbackId, NSDictionary* data) {
-    CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:data];
+void failureCallback(NSString* callbackId, NSString* data) {
+    CDVPluginResult* commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:data];
     commandResult.keepCallback = @1;
     [pluginCommandDelegate sendPluginResult:commandResult callbackId:callbackId];
 }
@@ -260,7 +260,15 @@ static Class delegateClass = nil;
 }
 
 - (void)subscribe:(CDVInvokedUrlCommand*)command {
-    [CleverPush subscribe];
+    [CleverPush subscribe:^(NSString* subscriptionId) {
+      if (pluginCommandDelegate && command.callbackId != nil) {
+          subscriptionCallback(command.callbackId, subscriptionId);
+      }
+  } failure:^(NSError* error) {
+    if (pluginCommandDelegate && command.callbackId != nil) {
+        failureCallback(command.callbackId, error.localizedDescription);
+    }
+  }];
 }
 
 - (void)unsubscribe:(CDVInvokedUrlCommand*)command {

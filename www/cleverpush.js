@@ -53,8 +53,16 @@ CleverPush.prototype.showTopicsDialog = function() {
   cordova.exec(function() {}, function() {}, 'CleverPush', 'showTopicsDialog', []);
 };
 
-CleverPush.prototype.subscribe = function() {
-  cordova.exec(function() {}, function() {}, 'CleverPush', 'subscribe', []);
+CleverPush.prototype.subscribe = function(subscribeListener) {
+  cordova.exec(function(subscriptionId) {
+    if (typeof subscribeListener === 'function') {
+      subscribeListener(null, subscriptionId);
+    }
+  }, function(error) {
+    if (typeof subscribeListener === 'function') {
+      subscribeListener(error);
+    }
+  }, 'CleverPush', 'subscribe', []);
 };
 
 CleverPush.prototype.unsubscribe = function() {

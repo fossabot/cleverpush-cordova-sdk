@@ -148,7 +148,17 @@ public class CleverPushPlugin extends CordovaPlugin {
         CleverPush.getInstance(this.cordova.getActivity()).showTopicsDialog();
         return true;
       case "subscribe":
-        CleverPush.getInstance(this.cordova.getActivity()).subscribe();
+        CleverPush.getInstance(this.cordova.getActivity()).subscribe(new SubscribedCallbackListener() {
+          @Override
+          public void onSuccess(String subscriptionId) {
+            callbackSuccess(callbackContext, subscriptionId);
+          }
+
+          @Override
+          public void onFailure(Throwable error) {
+            callbackError(callbackContext, error.getMessage());
+          }
+        });
         return true;
       case "unsubscribe":
         CleverPush.getInstance(this.cordova.getActivity()).unsubscribe();

@@ -1,3 +1,6 @@
+# 1.7.6
+* Implemented callback for `subscribe` method.
+
 # 1.7.5
 * Support `setAppBannerOpenedListener`
 
