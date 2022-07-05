@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
         id="cleverpush-cordova-plugin"
-        version="1.7.6">
+        version="1.7.7">
 
     <name>CleverPush</name>
     <author>CleverPush GmbH</author>
@@ -24,7 +24,7 @@
     </engines>
 
     <platform name="android">
-        <framework src="com.cleverpush:cleverpush:1.23.1" />
+        <framework src="com.cleverpush:cleverpush:1.23.5" />
 
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="CleverPush" >
@@ -32,13 +32,13 @@
             </feature>
         </config-file>
 
-        <source-file src="src/android/CleverPushPlugin.java" target-dir="src/" />
+        <source-file src="src/android/com/cleverpush/cordova/CleverPushPlugin.java" target-dir="src/com/cleverpush/cordova" />
     </platform>
 
     <platform name="ios">
         <podspec>
             <pods use-frameworks="true">
-                <pod name="CleverPush" spec="~> 1.18.0" />
+                <pod name="CleverPush" spec="~> 1.20.3" />
             </pods>
         </podspec>
 

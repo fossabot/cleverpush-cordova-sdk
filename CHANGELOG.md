@@ -1,3 +1,6 @@
+## 1.7.7
+* Fixed import of `SubscribedCallbackListener` in Android.
+
 ## 1.7.6
 * Implemented callback for `subscribe` method.
 

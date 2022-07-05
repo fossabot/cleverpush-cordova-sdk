@@ -9,6 +9,7 @@ import com.cleverpush.listener.NotificationOpenedListener;
 import com.cleverpush.listener.NotificationReceivedCallbackListener;
 import com.cleverpush.listener.NotificationReceivedListener;
 import com.cleverpush.listener.SubscribedListener;
+import com.cleverpush.listener.SubscribedCallbackListener;
 import com.cleverpush.listener.AppBannerOpenedListener;
 import com.google.gson.Gson;
 
