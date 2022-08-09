@@ -1,3 +1,7 @@
+## 1.7.8
+* Implemented `getSubscriptionId`
+* Fixed NotificationOpenedHandler
+
 ## 1.7.7
 * Fixed import of `SubscribedCallbackListener` in Android.
 

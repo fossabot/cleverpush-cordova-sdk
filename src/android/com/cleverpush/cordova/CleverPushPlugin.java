@@ -5,23 +5,23 @@ import android.util.Log;
 import com.cleverpush.CleverPush;
 import com.cleverpush.NotificationOpenedResult;
 import com.cleverpush.banner.models.BannerAction;
+import com.cleverpush.listener.AppBannerOpenedListener;
 import com.cleverpush.listener.NotificationOpenedListener;
 import com.cleverpush.listener.NotificationReceivedCallbackListener;
 import com.cleverpush.listener.NotificationReceivedListener;
-import com.cleverpush.listener.SubscribedListener;
 import com.cleverpush.listener.SubscribedCallbackListener;
-import com.cleverpush.listener.AppBannerOpenedListener;
+import com.cleverpush.listener.SubscribedListener;
 import com.google.gson.Gson;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.locks.Lock;
 
 public class CleverPushPlugin extends CordovaPlugin {
   public static final String TAG = "CleverPushPlugin";
@@ -38,6 +38,18 @@ public class CleverPushPlugin extends CordovaPlugin {
   private static final HashMap<String, Boolean> notificationReceivedCallbackResults = new HashMap<>();
   private static final HashMap<String, CountDownLatch> notificationReceivedCallbackLocks = new HashMap<>();
   private CordovaNotificationReceivedCallbackHandler notificationReceivedCallbackListener;
+
+  private static boolean cordovaWebViewDestroyed(CordovaPlugin cordova) {
+    try {
+      final CordovaWebView webView = cordova.webView;
+      if (webView != null) {
+        return webView.getUrl() == null;
+      }
+    } catch (Throwable error) {
+      Log.e(TAG, "cordovaWebViewDestroyed error: " + error.getMessage());
+    }
+    return false;
+  }
 
   private static void callbackSuccess(CallbackContext callbackContext, JSONObject jsonObject) {
     if (jsonObject == null) {
@@ -95,7 +107,7 @@ public class CleverPushPlugin extends CordovaPlugin {
           this.openedListener = null;
           if (openedCallbackContext != null) {
             this.openedListener = new CordovaNotificationOpenedHandler();
-            this.openedListener.setCallbackContext(openedCallbackContext);
+            this.openedListener.setCallbackContext(openedCallbackContext, this);
           }
           CordovaSubscribedHandler subscribedListener = null;
           if (subscribedCallbackContext != null) {
@@ -134,7 +146,7 @@ public class CleverPushPlugin extends CordovaPlugin {
       case "setNotificationOpenedHandler":
         openedCallbackContext = callbackContext;
         if (this.openedListener != null) {
-          this.openedListener.setCallbackContext(callbackContext);
+          this.openedListener.setCallbackContext(callbackContext, this);
         }
         return true;
       case "setSubscribedHandler":
@@ -249,12 +261,14 @@ public class CleverPushPlugin extends CordovaPlugin {
 
   private class CordovaNotificationOpenedHandler implements NotificationOpenedListener {
     private CallbackContext callbackContext;
+    private CordovaPlugin cordova;
 
     public CordovaNotificationOpenedHandler() {
     }
 
-    public void setCallbackContext(CallbackContext callbackContext) {
+    public void setCallbackContext(CallbackContext callbackContext, CordovaPlugin cordova) {
       this.callbackContext = callbackContext;
+      this.cordova = cordova;
 
       if (pendingNotificationOpenedResult != null && callbackContext != null) {
         try {
@@ -276,7 +290,7 @@ public class CleverPushPlugin extends CordovaPlugin {
         resultObj.put("subscription", new JSONObject(gson.toJson(result.getSubscription())));
 
         // Cordova might destroy the webview and throw an error here. We will save the pending result and trigger it again if the callback will be called again.
-        if (cleverPush != null && !cleverPush.isAppOpen()) {
+        if (cleverPush == null || cordovaWebViewDestroyed(this.cordova)) {
           pendingNotificationOpenedResult = resultObj;
           Log.d(TAG, "notificationOpened saving pendingResult");
           return;
