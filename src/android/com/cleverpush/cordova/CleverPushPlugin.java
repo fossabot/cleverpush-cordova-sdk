@@ -168,6 +168,10 @@ public class CleverPushPlugin extends CordovaPlugin {
         boolean isSubscribed = CleverPush.getInstance(this.cordova.getActivity()).isSubscribed();
         callbackSuccess(callbackContext, isSubscribed);
         return true;
+      case "getSubscriptionId":
+        String subscriptionId = CleverPush.getInstance(this.cordova.getActivity()).getSubscriptionId();
+        callbackSuccess(callbackContext, subscriptionId);
+        return true;
       default:
         Log.e(TAG, "Invalid action: " + action);
         callbackError(callbackContext, "Invalid action: " + action);

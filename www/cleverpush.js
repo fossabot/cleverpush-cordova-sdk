@@ -73,6 +73,10 @@ CleverPush.prototype.isSubscribed = function(callback) {
   cordova.exec(callback, function() {}, 'CleverPush', 'isSubscribed', []);
 };
 
+CleverPush.prototype.getSubscriptionId = function (callback) {
+  cordova.exec(callback, function () {}, 'CleverPush', 'getSubscriptionId', []);
+};
+
 if (!window.plugins) {
   window.plugins = {};
 }
