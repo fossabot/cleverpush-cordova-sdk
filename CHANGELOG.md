@@ -1,3 +1,6 @@
+## 1.7.9
+* Bump iOS & Android SDK version
+
 ## 1.7.8
 * Implemented `getSubscriptionId`
 * Fixed NotificationOpenedHandler
